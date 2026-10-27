@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بازی جایگاه حروف الفبا | هوش پاچینو</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-grad-1: #1e1b4b;
+            --bg-grad-2: #311042;
+            --card-bg: rgba(255, 255, 255, 0.97);
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .shape-1 { width: 300px; height: 300px; background: #6366f1; top: -100px; right: -100px; }
+        .shape-2 { width: 250px; height: 250px; background: #ec4899; bottom: -80px; left: -80px; }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 24px 20px;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* برندینگ هوش پاچینو */
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #eef2ff 0%, #fce7f3 100%);
+            border: 2px solid #c7d2fe;
+            padding: 8px 18px;
+            border-radius: 50px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
+        }
+
+        .brand-icon {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+        }
+
+        .brand-info {
+            text-align: right;
+        }
+
+        .brand-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            line-height: 1.2;
+        }
+
+        .brand-id {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--secondary);
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* صفحات */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-icon {
+            font-size: 50px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+		h1 {
+            font-size: 23px;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* دکمه‌های منو */
+        .mode-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: right;
+            width: 100%;
+        }
+
+        .mode-btn:hover, .mode-btn:active {
+            border-color: var(--primary);
+            background: #f5f3ff;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .mode-emoji {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary);
+            width: 52px;
+            height: 48px;
+            background: #eef2ff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mode-text h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .mode-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .learn-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 13px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        /* هدر بازی */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 10px 14px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .stat-box {
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .lives-box {
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .combo-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 12px;
+            font-weight: 900;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+            visibility: hidden;
+        }
+        .combo-badge.show {
+            visibility: visible;
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            transition: width 0.1s linear;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 22px;
+            padding: 22px 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+        }
+		.q-label {
+            font-size: 14px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .q-main {
+            font-size: 54px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .q-main.text-mode {
+            font-size: 21px;
+            line-height: 1.6;
+            padding: 8px 0;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .opt-btn {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-bottom-width: 5px;
+            border-radius: 18px;
+            padding: 15px 10px;
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .opt-btn:hover {
+            border-color: #a5b4fc;
+            background: #f8fafc;
+        }
+
+        .opt-btn.correct {
+            background: #d1fae5 !important;
+            border-color: var(--success) !important;
+            color: #065f46 !important;
+        }
+
+        .opt-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: #991b1b !important;
+        }
+
+        /* جدول آموزشی */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 6px;
+            margin-bottom: 16px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .alpha-cell {
+            background: white;
+            border-radius: 12px;
+            padding: 8px 4px;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .alpha-cell.group-1 { border-color: #93c5fd; background: #eff6ff; }
+        .alpha-cell.group-2 { border-color: #6ee7b7; background: #ecfdf5; }
+        .alpha-cell.group-3 { border-color: #fcd34d; background: #fffbeb; }
+        .alpha-cell.group-4 { border-color: #f9a8d4; background: #fdf2f8; }
+
+        .alpha-char { font-size: 20px; font-weight: 900; color: var(--text-main); }
+        .alpha-num { font-size: 12px; font-weight: 800; color: var(--primary); margin-top: 2px; }
+
+        .tip-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 13px;
+            color: #92400e;
+            text-align: right;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: var(--text-main);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .result-score-circle {
+            width: 115px;
+            height: 115px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #eef2ff 0%, #fce7f3 100%);
+            border: 5px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto 16px;
+        }
+		.result-score-num { font-size: 32px; font-weight: 900; color: var(--primary-dark); }
+        .result-score-label { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .r-stat {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            border-radius: 14px;
+        }
+        .r-stat-val { font-size: 18px; font-weight: 900; }
+        .r-stat-lbl { font-size: 11px; color: var(--text-muted); }
+
+        .footer-note {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px dashed #e5e7eb;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sound-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="app-container">
+        <canvas id="confetti-canvas"></canvas>
+
+        <!-- بج برندینگ هوش پاچینو -->
+        <div class="brand-badge">
+            <div class="brand-icon">🧠</div>
+            <div class="brand-info">
+                <div class="brand-title">آکادمی تیزهوشان هوش پاچینو</div>
+                <div class="brand-id">@hoshpachino</div>
+            </div>
+        </div>
+
+        <!-- ۱. صفحه منوی اصلی -->
+        <div id="screen-home" class="screen active">
+            <div class="hero-icon">🎮🔠</div>
+            <h1>بازی جایگاه حروف الفبا</h1>
+            <p class="subtitle">با بازی و هیجان، شماره جایگاه ۳۲ حرف الفبای فارسی را در کمتر از ۳ ثانیه به خاطر بسپار!</p>
+
+            <div class="mode-grid">
+                <button type="button" class="mode-btn" id="btn-mode-char2num">
+                    <div class="mode-btn-left">
+                        <div class="mode-emoji">الف⬅️۱</div>
+                        <div class="mode-text">
+                            <h3>حرف رو ببین، عددش رو بگو!</h3>
+                            <p>تشخیص شماره ردیفِ حرف نمایش داده شده</p>
+                        </div>
+                    </div>
+                    <span>❮</span>
+                </button>
+
+                <button type="button" class="mode-btn" id="btn-mode-num2char">
+                    <div class="mode-btn-left">
+                        <div class="mode-emoji">۱⬅️الف</div>
+                        <div class="mode-text">
+                            <h3>عدد رو ببین، حرفش رو بگو!</h3>
+                            <p>پیدا کردن حرف از روی شماره جایگاه</p>
+                        </div>
+                    </div>
+                    <span>❮</span>
+                </button>
+
+                <button type="button" class="mode-btn" id="btn-mode-challenge">
+                    <div class="mode-btn-left">
+                        <div class="mode-emoji">🔥🏆</div>
+                        <div class="mode-text">
+                            <h3>چالش ویژه تیزهوشان (ترکیبی)</h3>
+                            <p>ترکیب حروف + سوالات فاصله و رمزنگاری</p>
+                        </div>
+                    </div>
+                    <span>❮</span>
+                </button>
+            </div>
+
+            <button type="button" class="learn-btn" id="btn-open-learn">
+                <span>📖</span> جدول تقلب و تکنیک حفظ سریع الفبا
+            </button>
+
+            <div class="footer-note">
+                <span>طراحی اختصاصی برای دانش‌آموزان هوش پاچینو</span>
+                <button type="button" class="sound-toggle" id="sound-btn" title="قطع/وصل صدا">🔊</button>
+            </div>
+        </div>
+		<!-- ۲. صفحه آموزش و جدول الفبا -->
+        <div id="screen-learn" class="screen">
+            <h2 style="font-size: 18px; font-weight: 900; margin-bottom: 10px;">📖 جدول ۳۲ حرف الفبای فارسی</h2>
+            
+            <div class="tip-box">
+                💡 <strong>تکنیک ۳ ثانیه هوش پاچینو:</strong><br>
+                حروف الفبا را به <strong>۴ دسته ۸ تایی</strong> تقسیم کن! فقط کافیست حرف آخر هر دسته را حفظ کنی:<br>
+                • پایان دسته اول (۸): <strong>ح</strong> &nbsp;|&nbsp; • پایان دسته دوم (۱۶): <strong>ش</strong><br>
+                • پایان دسته سوم (۲۴): <strong>ق</strong> &nbsp;|&nbsp; • پایان دسته چهارم (۳۲): <strong>ی</strong>
+            </div>
+
+            <div class="alphabet-grid" id="alpha-table"></div>
+
+            <button type="button" class="btn-secondary" id="btn-back-home">بازگشت به منوی بازی 🏠</button>
+        </div>
+
+        <!-- ۳. صفحه اصلی بازی -->
+        <div id="screen-game" class="screen">
+            <div class="game-header">
+                <div class="stat-box">⭐️ امتیاز: <span id="score-val">۰</span></div>
+                <div class="stat-box">سوال: <span id="q-count">۱/۱۵</span></div>
+                <div class="lives-box" id="lives-val">❤️❤️❤️</div>
+            </div>
+
+            <div class="combo-badge" id="combo-badge">🔥 پاسخ صحیح پیاپی!</div>
+
+            <div class="timer-bar-wrap">
+                <div class="timer-bar" id="timer-bar"></div>
+            </div>
+
+            <div class="question-card">
+                <div class="q-label" id="q-label">جایگاه این حرف چند است؟</div>
+                <div class="q-main" id="q-main">ش</div>
+            </div>
+
+            <div class="options-grid" id="options-container"></div>
+
+            <button type="button" class="btn-secondary" id="btn-quit-game">انصراف و بازگشت ✖️</button>
+        </div>
+
+        <!-- ۴. صفحه نتیجه و کارنامه -->
+        <div id="screen-result" class="screen">
+            <div style="font-size: 44px;" id="res-emoji">🎉</div>
+            <h2 style="font-size: 21px; font-weight: 900; margin-bottom: 4px;" id="res-title">آفرین قهرمان هوش پاچینو!</h2>
+            <p style="font-size: 13px; color: var(--text-muted);" id="res-msg">تسلط عالی روی جایگاه حروف الفبا داشتی.</p>
+
+            <div class="result-score-circle">
+                <div class="result-score-num" id="res-score">۰</div>
+                <div class="result-score-label">امتیاز نهایی</div>
+            </div>
+
+            <div class="result-stats">
+                <div class="r-stat">
+                    <div class="r-stat-val" id="res-correct" style="color: var(--success);">۰</div>
+                    <div class="r-stat-lbl">پاسخ درست</div>
+                </div>
+                <div class="r-stat">
+                    <div class="r-stat-val" id="res-wrong" style="color: var(--danger);">۰</div>
+                    <div class="r-stat-lbl">پاسخ غلط</div>
+                </div>
+                <div class="r-stat">
+                    <div class="r-stat-val" id="res-best-combo" style="color: var(--accent);">۰</div>
+                    <div class="r-stat-lbl">بیشترین کومبو</div>
+                </div>
+            </div>
+
+            <button type="button" class="btn-primary" id="btn-replay">🔄 بازی مجدد در همین حالت</button>
+            <button type="button" class="btn-secondary" id="btn-result-home">🏠 انتخاب حالت دیگر</button>
+
+            <div class="footer-note" style="justify-content: center; font-weight: 800; color: var(--primary);">
+                کانال تخصصی تیزهوشان هوش پاچینو | @hoshpachino
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const ALPHABET = [
+                "الف", "ب", "پ", "ت", "ث", "ج", "چ", "ح",
+                "خ", "د", "ذ", "ر", "ز", "ژ", "س", "ش",
+                "ص", "ض", "ط", "ظ", "ع", "غ", "ف", "ق",
+                "ک", "گ", "ل", "م", "ن", "و", "هـ", "ی"
+            ];function toFaNum(num) {
+                const faDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                return String(num).replace(/\d/g, function(x) { return faDigits[x]; });
+            }
+
+            // سیستم صوتی ایمن
+            let soundEnabled = true;
+            let audioCtx = null;
+
+            function playTone(type) {
+                if (!soundEnabled) return;
+                try {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContextClass) return;
+                    if (!audioCtx) audioCtx = new AudioContextClass();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    const now = audioCtx.currentTime;
+                    if (type === 'correct') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(523.25, now);
+                        osc.frequency.setValueAtTime(659.25, now + 0.08);
+                        osc.frequency.setValueAtTime(783.99, now + 0.16);
+                        gain.gain.setValueAtTime(0.15, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                        osc.start(now);
+                        osc.stop(now + 0.35);
+                    } else if (type === 'wrong') {
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(220, now);
+                        osc.frequency.setValueAtTime(160, now + 0.15);
+                        gain.gain.setValueAtTime(0.12, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                        osc.start(now);
+                        osc.stop(now + 0.35);
+                    } else if (type === 'win') {
+                        osc.type = 'triangle';
+                        [523, 659, 784, 1046].forEach(function(freq, idx) {
+                            osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        });
+                        gain.gain.setValueAtTime(0.18, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                        osc.start(now);
+                        osc.stop(now + 0.5);
+                    }
+                } catch (e) {}
+            }
+
+            // ساخت جدول آموزشی
+            function buildAlphabetTable() {
+                const container = document.getElementById('alpha-table');
+                if (!container) return;
+                container.innerHTML = '';
+                for (let i = 0; i < ALPHABET.length; i++) {
+                    const num = i + 1;
+                    const groupNum = Math.ceil(num / 8);
+                    const cell = document.createElement('div');
+                    cell.className = 'alpha-cell group-' + groupNum;
+                    cell.innerHTML = '<span class="alpha-char">' + ALPHABET[i] + '</span>' +
+                                     '<span class="alpha-num">' + toFaNum(num) + '</span>';
+                    container.appendChild(cell);
+                }
+            }
+
+            // متغیرهای بازی
+            let currentMode = 'char2num';
+            let score = 0;
+            let lives = 3;
+            let qIndex = 0;
+            const totalQuestions = 15;
+            let combo = 0;
+            let bestCombo = 0;
+            let correctCount = 0;
+            let wrongCount = 0;
+            let timerInterval = null;
+            let timeLeft = 100;
+            let isAnswered = false;
+
+            function showScreen(screenId) {const screens = document.querySelectorAll('.screen');
+                for (let i = 0; i < screens.length; i++) {
+                    screens[i].classList.remove('active');
+                }
+                const target = document.getElementById(screenId);
+                if (target) target.classList.add('active');
+            }
+
+            function startGame(mode) {
+                currentMode = mode;
+                score = 0;
+                lives = 3;
+                qIndex = 0;
+                combo = 0;
+                bestCombo = 0;
+                correctCount = 0;
+                wrongCount = 0;
+                showScreen('screen-game');
+                nextQuestion();
+            }
+
+            function updateHeaderUI() {
+                document.getElementById('score-val').textContent = toFaNum(score);
+                document.getElementById('q-count').textContent = toFaNum(qIndex + 1) + '/' + toFaNum(totalQuestions);
+                
+                let hearts = '';
+                for (let i = 0; i < 3; i++) {
+                    hearts += (i < lives) ? '❤️' : '🖤';
+                }
+                document.getElementById('lives-val').textContent = hearts;
+
+                const comboEl = document.getElementById('combo-badge');
+                if (combo >= 2) {
+                    comboEl.textContent = '🔥 ' + toFaNum(combo) + ' پاسخ صحیح پیاپی!';
+                    comboEl.classList.add('show');
+                } else {
+                    comboEl.classList.remove('show');
+                }
+            }
+
+            // تولید ۴ گزینه بدون هیچ‌گونه حلقه بی‌نهایت
+            function generateFourOptions(correctVal, minVal, maxVal) {
+                const options = [correctVal];
+                const nearOffsets = [-3, -2, -1, 1, 2, 3, -4, 4, -5, 5];
+                
+                // تلاش برای انتخاب گزینه‌های نزدیک
+                for (let i = 0; i < 15 && options.length < 4; i++) {
+                    const off = nearOffsets[Math.floor(Math.random() * nearOffsets.length)];
+                    const cand = correctVal + off;
+                    if (cand >= minVal && cand <= maxVal && options.indexOf(cand) === -1) {
+                        options.push(cand);
+                    }
+                }
+                
+                // اگر هنوز ۴ تا نشده، از کل بازه پر کن
+                while (options.length < 4) {
+                    const rand = Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
+                    if (options.indexOf(rand) === -1) {
+                        options.push(rand);
+                    }
+                }
+
+                // بُر زدن گزینه‌ها
+                for (let i = options.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    const temp = options[i];
+                    options[i] = options[j];
+                    options[j] = temp;
+                }
+                return options;
+            }
+
+            function nextQuestion() {
+                clearInterval(timerInterval);
+                if (lives <= 0 || qIndex >= totalQuestions) {
+                    endGame();
+                    return;
+                }
+
+                isAnswered = false;
+                updateHeaderUI();
+
+                let qType = currentMode;
+                if (currentMode === 'challenge') {
+                    const types = ['char2num', 'num2char', 'offset'];
+                    qType = types[Math.floor(Math.random() * types.length)];
+                }
+
+                const qLabel = document.getElementById('q-label');
+                const qMain = document.getElementById('q-main');
+                qMain.classList.remove('text-mode');
+
+                let correctAnswer = '';
+                let finalOptions = [];if (qType === 'char2num') {
+                    const targetIdx = Math.floor(Math.random() * 32);
+                    const targetNum = targetIdx + 1;
+                    qLabel.textContent = 'شماره جایگاه این حرف در الفبا چند است؟';
+                    qMain.textContent = ALPHABET[targetIdx];
+                    correctAnswer = toFaNum(targetNum);
+
+                    const rawNums = generateFourOptions(targetNum, 1, 32);
+                    finalOptions = rawNums.map(function(n) { return toFaNum(n); });
+
+                } else if (qType === 'num2char') {
+                    const targetIdx = Math.floor(Math.random() * 32);
+                    const targetNum = targetIdx + 1;
+                    qLabel.textContent = 'کدام حرف در این جایگاه قرار دارد؟';
+                    qMain.textContent = toFaNum(targetNum);
+                    correctAnswer = ALPHABET[targetIdx];
+
+                    const rawIdxs = generateFourOptions(targetIdx, 0, 31);
+                    finalOptions = rawIdxs.map(function(idx) { return ALPHABET[idx]; });
+
+                } else {
+                    // سوال فاصله حروف (ویژه تیزهوشان)
+                    const stepAbs = Math.floor(Math.random() * 4) + 2; // 2 تا 5
+                    const isForward = Math.random() > 0.5;
+                    let baseIdx, targetIdx;
+
+                    if (isForward) {
+                        baseIdx = Math.floor(Math.random() * (32 - stepAbs));
+                        targetIdx = baseIdx + stepAbs;
+                    } else {
+                        baseIdx = Math.floor(Math.random() * (32 - stepAbs)) + stepAbs;
+                        targetIdx = baseIdx - stepAbs;
+                    }
+
+                    const dirWord = isForward ? 'بعد از' : 'قبل از';
+                    qLabel.textContent = 'سوال سرعت و دقت تیزهوشان:';
+                    qMain.classList.add('text-mode');
+                    qMain.textContent = toFaNum(stepAbs) + ' حرف ' + dirWord + ' «' + ALPHABET[baseIdx] + '» کدام است؟';
+                    correctAnswer = ALPHABET[targetIdx];
+
+                    const rawIdxs = generateFourOptions(targetIdx, 0, 31);
+                    finalOptions = rawIdxs.map(function(idx) { return ALPHABET[idx]; });
+                }
+
+                renderOptions(finalOptions, correctAnswer);
+                startTimer();
+            }
+
+            function renderOptions(options, correctAnswer) {
+                const container = document.getElementById('options-container');
+                container.innerHTML = '';
+                for (let i = 0; i < options.length; i++) {
+                    const optVal = options[i];
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'opt-btn';
+                    btn.textContent = optVal;
+                    btn.onclick = function() {
+                        checkAnswer(btn, optVal, correctAnswer);
+                    };
+                    container.appendChild(btn);
+                }
+            }
+
+            function startTimer() {
+                timeLeft = 100;
+                const bar = document.getElementById('timer-bar');
+                bar.style.width = '100%';
+                const duration = (currentMode === 'challenge') ? 10000 : 8000;
+                const step = 100 / (duration / 100);
+
+                timerInterval = setInterval(function() {
+                    timeLeft -= step;
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        clearInterval(timerInterval);
+                        handleTimeout();
+                    }
+                    bar.style.width = timeLeft + '%';
+                }, 100);
+            }
+
+            function handleTimeout() {
+                if (isAnswered) return;
+                isAnswered = true;
+                playTone('wrong');
+                lives--;
+                wrongCount++;
+                combo = 0;
+                updateHeaderUI();setTimeout(function() {
+                    qIndex++;
+                    nextQuestion();
+                }, 850);
+            }
+
+            function checkAnswer(selectedBtn, selectedVal, correctVal) {
+                if (isAnswered) return;
+                isAnswered = true;
+                clearInterval(timerInterval);
+
+                const allBtns = document.querySelectorAll('.opt-btn');
+
+                if (selectedVal === correctVal) {
+                    selectedBtn.classList.add('correct');
+                    playTone('correct');
+                    combo++;
+                    if (combo > bestCombo) bestCombo = combo;
+                    correctCount++;
+                    const timeBonus = Math.ceil(timeLeft / 20);
+                    score += 10 + (combo * 2) + timeBonus;
+                } else {
+                    selectedBtn.classList.add('wrong');
+                    for (let i = 0; i < allBtns.length; i++) {
+                        if (allBtns[i].textContent === correctVal) {
+                            allBtns[i].classList.add('correct');
+                        }
+                    }
+                    playTone('wrong');
+                    lives--;
+                    wrongCount++;
+                    combo = 0;
+                }
+
+                updateHeaderUI();
+
+                setTimeout(function() {
+                    qIndex++;
+                    nextQuestion();
+                }, 900);
+            }
+
+            function endGame() {
+                clearInterval(timerInterval);
+                showScreen('screen-result');
+                playTone('win');
+
+                document.getElementById('res-score').textContent = toFaNum(score);
+                document.getElementById('res-correct').textContent = toFaNum(correctCount);
+                document.getElementById('res-wrong').textContent = toFaNum(wrongCount);
+                document.getElementById('res-best-combo').textContent = toFaNum(bestCombo);
+
+                const resTitle = document.getElementById('res-title');
+                const resMsg = document.getElementById('res-msg');
+                const resEmoji = document.getElementById('res-emoji');
+
+                if (lives <= 0) {
+                    resEmoji.textContent = '💪';
+                    resTitle.textContent = 'تلاش خوبی بود قهرمان!';
+                    resMsg.textContent = 'یک بار جدول تکنیک ۳ ثانیه هوش پاچینو رو مرور کن و دوباره رکورد بزن!';
+                } else if (correctCount >= 13) {
+                    resEmoji.textContent = '🏆';
+                    resTitle.textContent = 'فوق‌العاده بود نابغه هوش پاچینو!';
+                    resMsg.textContent = 'جایگاه حروف الفبا رو مثل ساعت حفظ شدی! آماده حل تست‌های تیزهوشان هستی.';
+                    launchConfetti();
+                } else {
+                    resEmoji.textContent = '🌟';
+                    resTitle.textContent = 'آفرین! عملکرد خوبی داشتی';
+                    resMsg.textContent = 'با چند بار بازی بیشتر، سرعتت به زیر ۳ ثانیه می‌رسه!';
+                    launchConfetti();
+                }
+            }
+
+            function launchConfetti() {
+                const canvas = document.getElementById('confetti-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth || 400;
+                canvas.height = canvas.offsetHeight || 500;
+
+                const colors = ['#4f46e5', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'];
+                const pieces = [];
+                for (let i = 0; i < 50; i++) {
+                    pieces.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        size: Math.random() * 6 + 4,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        speed: Math.random() * 3 + 2,
+                        angle: Math.random() * 6.28
+                    });
+                }
+				let frames = 0;
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = 0; i < pieces.length; i++) {
+                        const p = pieces[i];
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        p.y += p.speed;
+                        p.x += Math.sin(p.angle);
+                    }
+                    frames++;
+                    if (frames < 110) requestAnimationFrame(draw);
+                    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                draw();
+            }
+
+            // اتصال مستقیم دکمه‌ها پس از بارگذاری صفحه
+            window.addEventListener('DOMContentLoaded', function() {
+                buildAlphabetTable();
+
+                document.getElementById('btn-mode-char2num').addEventListener('click', function() {
+                    startGame('char2num');
+                });
+                document.getElementById('btn-mode-num2char').addEventListener('click', function() {
+                    startGame('num2char');
+                });
+                document.getElementById('btn-mode-challenge').addEventListener('click', function() {
+                    startGame('challenge');
+                });
+                document.getElementById('btn-open-learn').addEventListener('click', function() {
+                    showScreen('screen-learn');
+                });
+                document.getElementById('btn-back-home').addEventListener('click', function() {
+                    showScreen('screen-home');
+                });
+                document.getElementById('btn-quit-game').addEventListener('click', function() {
+                    clearInterval(timerInterval);
+                    showScreen('screen-home');
+                });
+                document.getElementById('btn-replay').addEventListener('click', function() {
+                    startGame(currentMode);
+                });
+                document.getElementById('btn-result-home').addEventListener('click', function() {
+                    showScreen('screen-home');
+                });
+                document.getElementById('sound-btn').addEventListener('click', function() {
+                    soundEnabled = !soundEnabled;
+                    this.textContent = soundEnabled ? '🔊' : '🔇';
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
